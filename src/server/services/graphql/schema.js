@@ -33,11 +33,12 @@ const typeDefinitions = `
     posts: [Post]
   }
   type RootQuery {
+    user(username: String!): User @auth
     currentUser: User @auth
     posts: [Post]
     chats: [Chat] @auth
     chat(chatId: Int): Chat
-    postsFeed(page: Int, limit: Int): PostFeed @auth
+    postsFeed(page: Int, limit: Int, username: String): PostFeed @auth
     usersSearch(page: Int, limit: Int, text: String!): UsersSearch
   }
   input PostInput {
@@ -92,4 +93,3 @@ const typeDefinitions = `
 `;
 
 export default [typeDefinitions];
-

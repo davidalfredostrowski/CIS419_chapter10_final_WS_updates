@@ -1,82 +1,44 @@
 import React, { useState } from 'react';
-import { gql, useQuery, useMutation } from '@apollo/client';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Loading from './components/loading';
+import Error from './components/error';
 import Post from './components/post';
-const GET_POSTS = gql`
-	    {
-	    posts {
-                id
-                text
-                user {
-                    avatar
-                    username
-                }
-            }
-        }
-`;
-
-
-
-
-
-
-const ADD_POST = gql`
-    mutation addPost($post : PostInput!) {
-        addPost(post : $post) {
-            id
-            text
-  	    user {
-	    	username
-		avatar
-		}
-  	}
-    }
-`;
-
+import FeedList from './components/post/feedlist';
+import { useGetPostsQuery } from './apollo/queries/getPosts';
+import { useAddPostMutation } from './apollo/mutations/addPost';
 
 const Feed = () => {
     const [postContent, setPostContent] = useState('');
-    const { loading, error, data, fetchMore } = useQuery(GET_POSTS);
+    const [page, setPage] = useState(0);
+    const { loading, error, data, fetchMore } = useGetPostsQuery();
+    const [addPost] = useAddPostMutation(postContent);
 
-
-
-
-const [addPost] = useMutation(ADD_POST, {
-       optimisticResponse: {
-            __typename: "mutation",
-            addPost: {
-                __typename: "Post",
-                text: postContent,
-                id: -1,
-                user: {
-                    __typename: "User",
-                    username: "Loading...",
-		avatar: "/public/loading.png"
+    const loadMore = () => {
+        fetchMore({
+            variables: {
+                page: page + 1,
+            },
+            updateQuery(previousResult, { fetchMoreResult }) {
+                if(!fetchMoreResult.postsFeed.posts.length) {
+                    setHasMore(false);
+                    return previousResult;
                 }
-            }
-        }, 
-        update(cache, { data: { addPost } }) {
-	 cache.modify({
-                fields: {
-                    posts(existingPosts = []) {
-                        const newPostRef = cache.writeFragment({
-                            data: addPost,
-                            fragment: gql`
-                                fragment NewPost on Post {
-                                    id
-                                    type
-                                }
-                            `
-                        });
-                        return
-                          [newPostRef, ...existingPosts];
-                        
+
+                setPage(page + 1);
+
+                const newData = {
+                    postsFeed: {
+                        __typename: 'PostFeed',
+                        posts: [
+                            ...previousResult.postsFeed.posts,
+                            ...fetchMoreResult.postsFeed.posts
+                        ]
                     }
-                }
-            });
-        }
-    });
-
-
+                };
+                return newData;
+            }
+        });
+    }
 
 
     const handleSubmit = (event) => {
@@ -85,12 +47,12 @@ const [addPost] = useMutation(ADD_POST, {
         setPostContent('');
     };
 
+    if (loading) return <Loading />;
+    if (error) return <Error><p>{error.message}</p></Error>;
 
+    const { postsFeed } = data;
+    const { posts } = postsFeed;
 
-    if (loading) return 'Loading...';
-    if (error) return `Error! ${error.message}`;
-
-    const { posts } = data;
     return (
         <div className="container">
             <div className="postForm">
@@ -99,19 +61,11 @@ const [addPost] = useMutation(ADD_POST, {
                     <input type="submit" value="Submit" />
                 </form>
             </div>
-            <div className="feed">
-                {posts.map((post, i) =>
-               	<Post key={post.id} post={post} />     
+            <FeedList posts={posts} fetchMore={loadMore}/>
+        </div>
+    )
+}
+
+export default Feed
 
 
-
-		)}
-</div>
-    </div> )}
-
-
-
-
-
-
-export default Feed 

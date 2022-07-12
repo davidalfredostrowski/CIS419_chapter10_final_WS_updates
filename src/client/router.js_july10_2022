@@ -1,0 +1,63 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate , Switch } from 'react-router-dom';
+import LoginRegisterForm from './components/loginregister';
+import Main from './Main';
+
+
+
+export const routing = ({ changeLoginState, loggedIn }) => {
+  return (
+    <Router>
+      <Routes>
+	    <PrivateRoute path="/app" element={() => <Main changeLoginState={changeLoginState} />} loggedIn={loggedIn}/>
+	    <LoginRoute exact path="/" element={() => <LoginRegisterForm changeLoginState={changeLoginState}/>} loggedIn={loggedIn}/>
+
+
+)      
+
+ <Route component={NotFound} />
+ </Routes>
+    </Router>
+  )
+}
+
+//const PrivateRoute = ({ component: Component, ...rest }) => 
+
+const PrivateRoute = () => (
+	<Route {...rest} render={(props) => (
+		      rest.loggedIn === true
+		        ? <Component {...props} />
+		        : <Navigate to={{
+				          pathname: '/',
+					          state: { from: props.location }
+				        }} />
+		    )} />
+)
+
+const LoginRoute = () => (
+	  <Route {...rest} render={(props) => (
+		      rest.loggedIn === false
+		        ? <Component {...props} />
+		        : <Navigate to={{
+				          pathname: (typeof props.location.state !== typeof undefined) ?
+					          props.location.state.from.pathname : '/app',
+					        }} />
+		    )} />
+)
+
+
+
+
+
+const NotFound = () => {
+  return (
+    <Navigate to="/"/>
+  );
+}
+
+
+export default routing;
+
+
+
+

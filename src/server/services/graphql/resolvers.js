@@ -2,34 +2,25 @@ import logger from '../../helpers/logger';
 import Sequelize from 'sequelize';
 import bcrypt from 'bcrypt';
 import JWT from 'jsonwebtoken';
-import aws from 'aws-sdk';
-
 //import {
 //  GraphQLUpload
-//} from 'graphql-upload/GraphQLUpload.js';
+//} from 'graphql-upload';
+
 
 const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 
 
+
+import aws from 'aws-sdk';
 const s3 = new aws.S3({
   signatureVersion: 'v4',
   region: 'us-west-2',
-  accessKeyId: '
-	secretAccessKey: 
-
-
-
-
-
+	//  region: 'eu-central-1',
 });
 const Op = Sequelize.Op;
 const {
   JWT_SECRET
 } = process.env;
-
-// hsrdcoded JWT_SECRET value in two places. ....
-
-
 
 export default function resolver() {
   const {
@@ -112,9 +103,19 @@ export default function resolver() {
           users: User.findAll(query)
         };
       },
+      user(root, {
+        username
+      }, context) {
+        return User.findOne({
+          where: {
+            username
+          }
+        });
+      },
       postsFeed(root, {
         page,
-        limit
+        limit,
+        username
       }, context) {
         var skip = 0;
 
@@ -131,6 +132,15 @@ export default function resolver() {
 
         if (limit) {
           query.limit = limit;
+        }
+
+        if (username) {
+          query.include = [{
+            model: User
+          }];
+          query.where = {
+            '$User.username$': username
+          };
         }
 
         return {
@@ -208,12 +218,12 @@ export default function resolver() {
                 const token = JWT.sign({
                   email,
                   id: newUser.id
-                },
+                }, 
 
 "Asdadfafasdfasdfsadfsadfsadfasdfasdfasddddddddddddddddddddddddddddsadffffffffffvadfadfasdfasssssssss1231231231231231321231231231"
+			,{
 
-	, {
-                  expiresIn: '1d'
+			expiresIn: '1d'
                 });
                 return {
                   token
@@ -239,21 +249,17 @@ export default function resolver() {
             if (!passwordValid) {
               throw new Error('Password does not match');
             }
+            const token = JWT.sign({
+              email,
+              id: user.id
+            },
+
+"Asdadfafasdfasdfsadfsadfsadfasdfasdfasddddddddddddddddddddddddddddsadffffffffffvadfadfasdfasssssssss1231231231231231321231231231"
 
 
-      //      const token = JWT.sign({
-      //        email,
-      //        id: user.id
-      //      }, JWT_SECRET, {
-      //        expiresIn: '1d'
-      //      });
-
-
-                        const token = JWT.sign({ email, id: user.id }, "Asdadfafasdfasdfsadfsadfsadfasdfasdfasddddddddddddddddddddddddddddsadffffffffffvadfadfasdfasssssssss1231231231231231321231231231"
-
- , {
-                            expiresIn: '1d'
-                        });
+		    , {
+              expiresIn: '1d'
+            });
 
             return {
               token
@@ -309,7 +315,7 @@ export default function resolver() {
           mimetype,
           encoding
         } = await file;
-        const bucket = 'als-bucket-6-26';
+        const bucket = 'apollo-book';
         const params = {
           Bucket: bucket,
           Key: context.user.id + '/' + filename,
@@ -385,8 +391,3 @@ export default function resolver() {
 
   return resolvers;
 }
-
-
-
-
-
