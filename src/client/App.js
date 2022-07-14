@@ -11,8 +11,13 @@ import Router from './router';
 
 
 
-const App = () => {
-  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('jwt'));
+//const App = () => {
+
+
+const App = ({ location, context, loggedIn: loggedInProp})=> {
+    const [loggedIn, setLoggedIn] = useState((typeof window.__APOLLO_STATE__ !== typeof undefined && typeof window.__APOLLO_STATE__.ROOT_QUERY !== typeof undefined && typeof window.__APOLLO_STATE__.ROOT_QUERY.currentUser !== typeof undefined));
+
+//  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('jwt'));
   const { data, error, loading, refetch } = useCurrentUserQuery();
 
 	const handleLogin = (status) => {

@@ -85,6 +85,9 @@ const typeDefinitions = `
     uploadAvatar (
       file: Upload!
     ): File @auth
+   logout: Response @auth
+
+
   }
   schema {
     query: RootQuery
