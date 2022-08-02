@@ -34,7 +34,7 @@ const client = new ApolloClient({
   //  }),
   AuthLink,
     createUploadLink({
-	    uri: 'http://ec2-35-87-51-159.us-west-2.compute.amazonaws.com:8000/graphql',
+	    uri: 'http://ec2-34-216-254-77.us-west-2.compute.amazonaws.com:8000/graphql',
       credentials: 'same-origin',
     }),
 
@@ -59,3 +59,4 @@ const client = new ApolloClient({
 
 
 export default client;
+

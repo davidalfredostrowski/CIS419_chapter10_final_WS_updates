@@ -6,13 +6,6 @@ import authDirective from './auth';
 import JWT from 'jsonwebtoken';
 //const { JWT_SECRET } = process.env;
 // hardcoded it in .....
-//
-//
-//
-
-
-
-
 
 export default (utils) => {
   const { authDirectiveTypeDefs, authDirectiveTransformer } = authDirective('auth');

@@ -1,21 +1,16 @@
 const typeDefinitions = `
   directive @auth on QUERY | FIELD_DEFINITION | FIELD
   scalar Upload
-  type File {
-    filename: String!
-    mimetype: String!
-    encoding: String!
-    url: String!
+  type User {
+    id: Int
+    avatar: String
+    username: String
+    email: String
   }
   type Post {
     id: Int
     text: String
     user: User
-  }
-  type User {
-    id: Int
-    avatar: String
-    username: String
   }
   type Message {
     id: Int
@@ -26,23 +21,23 @@ const typeDefinitions = `
   type Chat {
     id: Int
     messages: [Message]
-    lastMessage: Message
     users: [User]
+    lastMessage: Message
   }
   type PostFeed {
     posts: [Post]
   }
-  type RootQuery {
-    user(username: String!): User @auth
-    currentUser: User @auth
-    posts: [Post]
-    chats: [Chat] @auth
-    chat(chatId: Int): Chat
-    postsFeed(page: Int, limit: Int, username: String): PostFeed @auth
-    usersSearch(page: Int, limit: Int, text: String!): UsersSearch
+  type File {
+    filename: String!
+    url: String!
   }
   input PostInput {
     text: String!
+  }
+  
+  input UserInput {
+    username: String!
+    avatar: String!
   }
   input ChatInput {
     users: [Int]
@@ -60,6 +55,7 @@ const typeDefinitions = `
   type Auth {
     token: String
   }
+  
   type RootMutation {
     addPost (
       post: PostInput!
@@ -70,6 +66,10 @@ const typeDefinitions = `
     addMessage (
       message: MessageInput!
     ): Message
+    updatePost (
+      post: PostInput!
+      postId: Int!
+    ): Post
     deletePost (
       postId: Int!
     ): Response
@@ -85,13 +85,24 @@ const typeDefinitions = `
     uploadAvatar (
       file: Upload!
     ): File @auth
-   logout: Response @auth
-
-
+    logout: Response @auth
+  }
+  type RootQuery {
+    posts: [Post]
+    chats: [Chat]
+    chat(chatId: Int): Chat
+    postsFeed(page: Int, limit: Int, username: String): PostFeed @auth
+    user(username: String!): User @auth
+    usersSearch(page: Int, limit: Int, text: String!): UsersSearch
+    currentUser: User @auth
+  }
+  type RootSubscription {
+    messageAdded: Message
   }
   schema {
     query: RootQuery
     mutation: RootMutation
+    subscription: RootSubscription
   }
 `;
 

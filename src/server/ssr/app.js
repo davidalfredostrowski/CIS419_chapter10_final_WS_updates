@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { withApollo } from '@apollo/client/react/hoc';
@@ -22,4 +21,3 @@ const App = ({ location, context, loggedIn: loggedInProp }) => {
 }
 
 export default withApollo(App)
-
