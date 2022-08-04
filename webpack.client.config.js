@@ -34,7 +34,7 @@ module: {
     ,
     devServer: {
 
-        allowedHosts: [ 'ec2-34-216-254-77.us-west-2.compute.amazonaws.com'],
+        allowedHosts: [ 'ec2-18-237-116-243.us-west-2.compute.amazonaws.com'],
         port: 3000,
        	open: true,
    	historyApiFallback: true 
